@@ -1,0 +1,23 @@
+#!/bin/sh
+
+PHP_FPM_PID=0
+NGINX_PID=0
+clenup() {
+	if [ ${PHP_FPM_PID} -ne 0 ]; then
+		kill ${PHP_FPM_PID}
+	fi
+	if [ ${NGINX_PID} -ne 0 ]; then
+		kill ${NGINX_PID}
+	fi
+}
+trap 'cleanup' 15
+
+/usr/local/sbin/php-fpm &
+PHP_FPM_PID=$!
+
+/usr/sbin/nginx -g "daemon off;" &
+NGINX_PID=$!
+
+wait -n
+
+exit $?
